@@ -1,0 +1,5 @@
+{
+  "caPath": "config/ca.pem",
+  "certPath": "config/client.pem",
+  "keyPath": "config/client.key"
+}
