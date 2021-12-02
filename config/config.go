@@ -4,13 +4,13 @@ package config
 import (
 	"encoding/json"
 	"fmt"
-	consulapi "github.com/hashicorp/consul/api"
+	consulApi "github.com/hashicorp/consul/api"
 	"io/ioutil"
 )
 
 const (
 	defaultTLSConfigFile = "config/configTLS.json"
-	topicsPathInKV = "mqttClient/topics"
+	topicsPathInKV       = "mqttClient/topics"
 )
 
 // configTLS содержит пути к сертификатам для TLS.
@@ -22,7 +22,7 @@ type configTLS struct {
 
 // StoreKV содержит клиент подключения к consul и последний полученный индекс.
 type StoreKV struct {
-	client *consulapi.Client
+	client    *consulApi.Client
 	LastIndex uint64
 }
 
@@ -50,16 +50,16 @@ func ReadSettings() (*configTLS, error) {
 }
 
 // MakeKVClient возвращает объект для подключения к consul.
-func MakeKVClient() StoreKV{
+func MakeKVClient() StoreKV {
 	return StoreKV{LastIndex: 0}
 }
 
 // Connect подключается к consul и возвращает клиент.
-func (s *StoreKV) Connect(address string) (*consulapi.Client, error) {
+func (s *StoreKV) Connect(address string) (*consulApi.Client, error) {
 	var err error
-	consulCfg := consulapi.DefaultConfig()
+	consulCfg := consulApi.DefaultConfig()
 	consulCfg.Address = address
-	s.client, err = consulapi.NewClient(consulCfg)
+	s.client, err = consulApi.NewClient(consulCfg)
 
 	if err != nil {
 		return nil, fmt.Errorf("Ошибка при подключении к consul %s\n", err)
@@ -69,8 +69,8 @@ func (s *StoreKV) Connect(address string) (*consulapi.Client, error) {
 }
 
 // LoadConfig получает данные из consul и возвращает их в виде map.
-func (s *StoreKV) LoadConfig(fieldName string) (map[string]string, error){
-	QueryOpt := &consulapi.QueryOptions{WaitIndex: s.LastIndex}
+func (s *StoreKV) LoadConfig(fieldName string) (map[string]string, error) {
+	QueryOpt := &consulApi.QueryOptions{WaitIndex: s.LastIndex}
 
 	KVPair, _, err := s.client.KV().Get(fieldName, QueryOpt)
 	if err != nil {
@@ -91,6 +91,6 @@ func (s *StoreKV) LoadConfig(fieldName string) (map[string]string, error){
 }
 
 // LoadTopics получает список топиков из consul.
-func (s *StoreKV) LoadTopics() (map[string]string, error){
+func (s *StoreKV) LoadTopics() (map[string]string, error) {
 	return s.LoadConfig(topicsPathInKV)
 }
