@@ -1,4 +1,4 @@
-// Package client управляет подключением к брокеру mqtt.
+// Package client управляет подключением к брокеру mqtt и получением данных.
 package client
 
 import (
@@ -12,7 +12,7 @@ import (
 
 // MqttClient структура для подключения к брокеру mqtt.
 type MqttClient struct {
-	opts *mqtt.ClientOptions
+	opts   *mqtt.ClientOptions
 	client mqtt.Client
 	topics []string
 }
@@ -111,7 +111,7 @@ func (m *MqttClient) SetHandler() {
 }
 
 // Connecting подключается к mqtt используя полученные ранее настройки.
-func (m *MqttClient) Connecting() *mqtt.Client{
+func (m *MqttClient) Connecting() *mqtt.Client {
 	m.client = mqtt.NewClient(m.opts)
 	if token := m.client.Connect(); token.Wait() && token.Error() != nil {
 		log.Fatal(token.Error())
@@ -162,7 +162,7 @@ var isConnected = func(m *MqttClient) bool {
 }
 
 // logger ведет лог событий в ходе работы программы
-var logger = func (message string) {
+var logger = func(message string) {
 	log.Println(message)
 }
 
