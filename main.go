@@ -3,8 +3,8 @@ package main
 import (
 	"flag"
 	"log"
-	"mqtt_client/client"
-	"mqtt_client/config"
+	"mqtt2clickhouse/client"
+	"mqtt2clickhouse/config"
 )
 
 func main() {
