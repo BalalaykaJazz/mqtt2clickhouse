@@ -8,6 +8,7 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"io/ioutil"
 	"log"
+	"mqtt2clickhouse/message"
 )
 
 // MqttClient структура для подключения к брокеру mqtt.
@@ -19,7 +20,7 @@ type MqttClient struct {
 
 // messagePubHandler обработчик событий при получении сообщений из mqtt.
 var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
-	logger(fmt.Sprintf("Получено сообщение: %s из темы: %s", msg.Payload(), msg.Topic()))
+	message.DataChannel <- &message.Message{Topic: msg.Topic(), Value: msg.Payload()}
 }
 
 // connectHandler обработчик событий при подключении к mqtt.
