@@ -69,28 +69,33 @@ func (s *StoreKV) Connect(address string) (*consulApi.Client, error) {
 }
 
 // LoadConfig получает данные из consul и возвращает их в виде map.
-func (s *StoreKV) LoadConfig(fieldName string) (map[string]string, error) {
+func (s *StoreKV) LoadConfig(fieldName string) (map[string]string, bool, error) {
 	QueryOpt := &consulApi.QueryOptions{WaitIndex: s.LastIndex}
 
 	KVPair, _, err := s.client.KV().Get(fieldName, QueryOpt)
 	if err != nil {
-		return nil, fmt.Errorf("Ошибка при получении данных из consul %s\n", err)
+		return nil, false, fmt.Errorf("Ошибка при получении данных из consul %s\n", err)
 	} else if KVPair == nil {
-		return nil, fmt.Errorf("Ошибка при получении данных из consul: данные не найдены.\n")
+		return nil, false, fmt.Errorf("Ошибка при получении данных из consul: данные не найдены.\n")
 	}
 
 	var kv map[string]string
 	err = json.Unmarshal(KVPair.Value, &kv)
 	if err != nil {
-		return nil, fmt.Errorf("Ошибка при чтении настроек из consul %s \n", err)
+		return nil, false, fmt.Errorf("Ошибка при чтении настроек из consul %s \n", err)
 	}
 
-	s.LastIndex = KVPair.ModifyIndex
+	var ok bool
 
-	return kv, nil
+	if KVPair.ModifyIndex != s.LastIndex {
+		s.LastIndex = KVPair.ModifyIndex
+		ok = true
+	}
+
+	return kv, ok, nil
 }
 
 // LoadTopics получает список топиков из consul.
-func (s *StoreKV) LoadTopics() (map[string]string, error) {
+func (s *StoreKV) LoadTopics() (map[string]string, bool, error) {
 	return s.LoadConfig(topicsPathInKV)
 }

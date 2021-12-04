@@ -95,13 +95,15 @@ func main() {
 	go ReadQueue(&explorer)
 
 	for true {
-		topicsMap, err := kv.LoadTopics()
+		topicsMap, ok, err := kv.LoadTopics()
 		if err != nil {
 			message.QuitChannel <- 0
 			log.Fatal(err)
 		}
 
-		c.UnsubscribeAll()
-		c.SubscribeAll(topicsMap)
+		if ok {
+			c.UnsubscribeAll()
+			c.SubscribeAll(topicsMap)
+		}
 	}
 }
